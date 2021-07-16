@@ -1,0 +1,49 @@
+body{
+    background-color: beige;
+}
+
+
+.header {
+    margin: 2em 0;
+    
+}
+
+
+.note {
+    background: orange;
+    padding: 8px;
+    margin-bottom: 8px;
+    box-shadow: 5px 5px #efefef;
+    display: flex;
+}
+.note-section > div {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.note-section textarea {
+    width: 100%;
+    background-color: orange;
+}
+
+.note .input textarea {
+    background: orange;
+    border: solid 1px black;
+}
+
+.note .input:hover textarea {
+    border: solid 3px black;
+}
+
+.note .input {
+    flex: 1;
+}
+
+
+
+.remove {
+    float: right;
+    padding: 8;
+    background: black;
+    color: white;
+}
