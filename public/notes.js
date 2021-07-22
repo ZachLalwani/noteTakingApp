@@ -1,21 +1,25 @@
 
+
 var notesTemplate = Handlebars.compile(
   `
     {{#each notes}}
     <div class="note">
-        <span class="input"><textarea data-horse="pony" data-id="{{ @index }}"> {{ this }}</textarea></span>
+        <span class="input"><textarea data-id="{{ id }}">{{ content }}</textarea></span>
 
-        <button class="remove btn btn-xs" data-id="{{ @index }}">Delete</button>
+        <button class="remove btn btn-xs" data-id="{{ id }}"><i class = "fa fa-trash" aria-hidden="true"></i></button>
         </div>
         {{/each}}
     `
 );
 
-const reloadNotes = (notes) => {
-  console.log("RELOADING");
-  console.log(notes);
-  console.log(8);
-  $("#notes").html(notesTemplate({ notes: notes }));
+const reloadNotes = (data) => {
+  console.log("trying");
+  console.log(data);
+  $("#notes").html(
+    notesTemplate({
+      notes: data,
+    })
+  );
 };
 
 const beginSaving = (target) => {
@@ -23,19 +27,25 @@ const beginSaving = (target) => {
   $(".saving").show();
 };
 
-// This function is used and defined to make a message disappear on the dom after saving our note.
 const endSaving = (target) => {
   $(target).prop("disabled", true);
   $(".saving").hide();
 };
 
+$(() => {
+  axios
+    .get("/api/notes/")
+    .then((res) => {
+      console.log(res.data, "X");
+      reloadNotes(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-
-  // Add an event listener on the add button, such then when we press the button we grab the value from our text box and then send that value to our server in our post request, then we receive the new data from our server and reload all of our notes.
   $("#add").submit((e) => {
     e.preventDefault();
     console.log("add pressed");
-    console.log(1);
 
     var val = $("textarea[name=note]").val();
     console.log(val);
@@ -44,29 +54,25 @@ const endSaving = (target) => {
     }
     $("textarea[name=note]").val("");
     axios
-      .post("/api/info/", {
+      .post("/api/notes/", {
         note: val,
       })
       .then((res) => {
-        // window.location.reload();
-        console.log(res);
         console.log(res.data);
-        console.log(7);
         reloadNotes(res.data);
       })
       .catch((err) => {
         console.log(err);
-        window.location.reload();
       });
   });
 
   $("#notes").on("blur", "textarea", (event) => {
-    beginSaving(event.currentTarget);
-    console.log($(event.currentTarget).data("horse"));
+    console.log("I am editing");
     console.log($(event.currentTarget).data("id"));
 
+    beginSaving(event.currentTarget);
     axios
-      .put("/api/info/" + $(event.currentTarget).data("id"), {
+      .put("/api/notes/" + $(event.currentTarget).data("id"), {
         note: $(event.currentTarget).val(),
       })
       .then((res) => {
@@ -80,19 +86,30 @@ const endSaving = (target) => {
   });
 
   $("#notes").on("click", ".remove", (event) => {
-    beginSaving(event.currentTarget); // show saving message on DOM
-    // Below we send out delete request using the data-id property on our targeted text area/ button
-    console.log($(event.currentTarget).data("id"));
+    beginSaving(event.currentTarget);
+
     axios
-      .delete("/api/info/" + $(event.currentTarget).data("id"))
+      .delete("/api/notes/" + $(event.currentTarget).data("id"))
       .then((res) => {
-        endSaving(event.currentTarget); // remove saving message from the DOM
-        reloadNotes(res.data); // reload the notes on the DOM so that we only render the updated notes
+        endSaving(event.currentTarget);
+        reloadNotes(res.data);
       })
       .catch((e) => {
         endSaving(e.currentTarget);
         alert(e);
       });
   });
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
